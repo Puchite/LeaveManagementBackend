@@ -20,35 +20,45 @@ exports.signup = (req, res) => {
     .then(user => {
       if (req.body.roles) {
         Role.findAll({
-          where: {
-            name: {
-              [Op.or]: req.body.roles
+            where: {
+              name: {
+                [Op.or]: req.body.roles
+              }
             }
-          }
-        }).then(roles => {
-          user.setRoles(roles)
-            .then(() => {
+          })
+          .then(roles => {
+            user.setRoles(roles)
+              .then(() => {
 
-              UserData.create({
-                  username: req.body.username,
-                  name: req.body.name,
-                  leaveQuota: 3
-                })
-                .then(data => {
-                  res.send({
-                    message: "User registered successfully",
-                  });
-                })
+                UserData.create({
+                    username: req.body.username,
+                    name: req.body.name,
+                    leaveQuota: 3
+                  })
+                  .then(data => {
+                    res.send({
+                      message: "User registered successfully",
+                    });
+                  })
 
-            });
-        });
+              });
+          });
       } else {
         // user role = 1
-        user.setRoles([1]).then(() => {
-          res.send({
-            message: "User registered successfully role is user",
+        user.setRoles([1])
+          .then(() => {
+
+            UserData.create({
+                username: req.body.username,
+                name: req.body.name,
+                leaveQuota: 3
+              })
+              .then(data => {
+                res.send({
+                  message: "User registered successfully role is user",
+                });
+              })
           });
-        });
       }
 
 
@@ -99,20 +109,23 @@ exports.signin = (req, res) => {
 
         UserData.findOne({
             where: {
-              username: user.username
+              username: req.body.username
             }
           })
           .then(userdata => {
             console.log(userdata);
-            res.status(200).send({
-              id: user.id,
-              username: user.username,
-              name: userdata.name,
-              leaveQuota: userdata.leaveQuota,
-              email: user.email,
-              roles: authorities,
-              accessToken: token
-            });
+            if (userdata) {
+              res.status(200).send({
+                id: user.id,
+                username: user.username,
+                name: userdata.name,
+                leaveQuota: userdata.leaveQuota,
+                email: user.email,
+                roles: authorities,
+                accessToken: token
+              });
+            }
+
           })
 
       });

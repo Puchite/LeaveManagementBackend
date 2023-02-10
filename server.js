@@ -7,7 +7,7 @@ const bcrypt = require("bcryptjs");
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT;
+const port = process.env.PORT | 4000;
 
 var corsOptions = {
   origin: "http://localhost:4200"
